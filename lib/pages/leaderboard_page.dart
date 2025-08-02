@@ -42,10 +42,11 @@ class LeaderboardPageState extends State<LeaderboardPage> {
         body: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 8.0),
+              padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
               child: CustomContainer(
                 width: double.infinity,
-                backgroundColor: Colors.green.shade200,
+                borderRadius: 10,
+                backgroundColor: Colors.green.shade100,
                 child: Center(
                   child: CustomText(
                     text: "Top Donators",
@@ -71,7 +72,7 @@ class LeaderboardPageState extends State<LeaderboardPage> {
                         top: 8.0,
                       ),
                       child: Card(
-                        color: Colors.grey.shade200,
+                        color: Colors.grey.shade100,
                         child: ListTile(
                           leading: CustomText(
                             text: "${index + 1}",
