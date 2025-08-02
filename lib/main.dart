@@ -148,7 +148,7 @@ class HomePageState extends State<HomePage> {
                           Navigator.push(
                             context,
                             PageTransition(
-                              type: PageTransitionType.rightToLeftWithFade,
+                              type: PageTransitionType.rightToLeft,
                               curve: Curves.fastOutSlowIn,
                               duration: Duration(milliseconds: 400),
                               child: SignupPage(),

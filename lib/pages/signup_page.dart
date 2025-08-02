@@ -149,7 +149,7 @@ class SignupPageState extends State<SignupPage> {
                           Navigator.pushReplacement(
                             context,
                             PageTransition(
-                              type: PageTransitionType.rightToLeftWithFade,
+                              type: PageTransitionType.leftToRight,
                               curve: Curves.fastOutSlowIn,
                               duration: Duration(milliseconds: 400),
                               child: HomePage(),

@@ -19,6 +19,7 @@ class DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Row(
           children: [
             Icon(Icons.dashboard, color: Colors.white, size: 30),
