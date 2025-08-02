@@ -10,19 +10,26 @@ class LeaderboardPage extends StatefulWidget {
 }
 
 class LeaderboardPageState extends State<LeaderboardPage> {
-  List<String> topDonatorNames = [
-    'Aarav Mehta',
-    'Sneha Reddy',
-    'Ishaan Verma',
-    'Priya Kapoor',
-    'Rohit Nair',
-  ];
-  final List<String> topDonatorScores = [
-    '₹72,500',
-    '₹45,000',
-    '₹91,200',
-    '₹18,750',
-    '₹66,300',
+  // List<String> topDonatorNames = [
+  //   'Aarav Mehta',
+  //   'Sneha Reddy',
+  //   'Ishaan Verma',
+  //   'Priya Kapoor',
+  //   'Rohit Nair',
+  // ];
+  // final List<String> topDonatorScores = [
+  //   '₹72,500',
+  //   '₹45,000',
+  //   '₹91,200',
+  //   '₹18,750',
+  //   '₹66,300',
+  // ];
+  List<Map<String, String>> topDonors = [
+    {'name': 'Aarav Mehta', 'donated': '₹72,500'},
+    {'name': 'Sneha Reddy', 'donated': '₹45,000'},
+    {'name': 'Ishaan Verma', 'donated': '₹91,200'},
+    {'name': 'Priya Kapoor', 'donated': '₹18,750'},
+    {'name': 'Rohit Nair', 'donated': '₹66,300'},
   ];
 
   @override
@@ -64,7 +71,7 @@ class LeaderboardPageState extends State<LeaderboardPage> {
                   borderRadius: 10.0,
                   backgroundColor: Colors.blue.shade100,
                   child: ListView.builder(
-                    itemCount: topDonatorNames.length,
+                    itemCount: topDonors.length,
                     itemBuilder: (BuildContext context, int index) => Padding(
                       padding: const EdgeInsets.only(
                         left: 8.0,
@@ -88,14 +95,14 @@ class LeaderboardPageState extends State<LeaderboardPage> {
                               ),
                               SizedBox(width: 8),
                               CustomText(
-                                text: topDonatorNames[index],
+                                text: topDonors[index]['name']!,
                                 textColor: Colors.black,
                                 textSize: 23,
                               ),
                             ],
                           ),
                           trailing: CustomText(
-                            text: topDonatorScores[index],
+                            text: topDonors[index]['donated']!,
                             textColor: Colors.black,
                             textSize: 25,
                           ),
