@@ -104,6 +104,8 @@ class SignupPageState extends State<SignupPage> {
                     validate: (String? value) {
                       if (value == null || value.isEmpty) {
                         return "Please Enter Your Password";
+                      } else if (value.length <= 5) {
+                        return "Password must be more than 5 characters";
                       }
                       return null;
                     },
