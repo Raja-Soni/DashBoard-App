@@ -10,20 +10,6 @@ class LeaderboardPage extends StatefulWidget {
 }
 
 class LeaderboardPageState extends State<LeaderboardPage> {
-  // List<String> topDonatorNames = [
-  //   'Aarav Mehta',
-  //   'Sneha Reddy',
-  //   'Ishaan Verma',
-  //   'Priya Kapoor',
-  //   'Rohit Nair',
-  // ];
-  // final List<String> topDonatorScores = [
-  //   '₹72,500',
-  //   '₹45,000',
-  //   '₹91,200',
-  //   '₹18,750',
-  //   '₹66,300',
-  // ];
   List<Map<String, String>> topDonors = [
     {'name': 'Aarav Mehta', 'donated': '₹72,500'},
     {'name': 'Sneha Reddy', 'donated': '₹45,000'},

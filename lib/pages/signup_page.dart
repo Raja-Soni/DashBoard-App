@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
 import '../custom_widgets/custom_input_text_field.dart';
+import '../firebase_auth_functions/authenticate_users.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -82,7 +83,7 @@ class SignupPageState extends State<SignupPage> {
                     icon: Icon(Icons.email_outlined),
                     validate: (String? value) {
                       final emailRegex = RegExp(
-                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                        r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$',
                       );
                       if (value == null || value.isEmpty) {
                         return "Please Enter Your Email";
@@ -124,6 +125,7 @@ class SignupPageState extends State<SignupPage> {
                         String name =
                             givenName[0].toUpperCase() +
                             givenName.toLowerCase().substring(1);
+                        signUpNewUser(givenEmail, givenPassword);
                         Navigator.pushReplacement(
                           context,
                           PageTransition(

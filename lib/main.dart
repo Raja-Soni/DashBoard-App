@@ -1,13 +1,18 @@
 import 'package:dashboard_app/custom_widgets/custom_button.dart';
 import 'package:dashboard_app/custom_widgets/custom_text.dart';
+import 'package:dashboard_app/firebase_auth_functions/authenticate_users.dart';
+import 'package:dashboard_app/firebase_options.dart';
 import 'package:dashboard_app/pages/dashboard_page.dart';
 import 'package:dashboard_app/pages/signup_page.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
 import 'custom_widgets/custom_input_text_field.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -82,7 +87,7 @@ class HomePageState extends State<HomePage> {
                     icon: Icon(Icons.email_outlined),
                     validate: (String? value) {
                       final emailRegex = RegExp(
-                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                        r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$',
                       );
                       if (value == null || value.isEmpty) {
                         return "Please Enter Your Email";
@@ -117,19 +122,29 @@ class HomePageState extends State<HomePage> {
                   SizedBox(height: 30),
                   CustomButton(
                     buttonText: "LOG IN",
-                    callback: () {
+                    callback: () async {
                       bool isValidate = formKey.currentState!.validate();
                       if (isValidate) {
                         formKey.currentState!.save();
-                        Navigator.pushReplacement(
-                          context,
-                          PageTransition(
-                            type: PageTransitionType.rightToLeftWithFade,
-                            curve: Curves.fastOutSlowIn,
-                            duration: Duration(milliseconds: 400),
-                            child: DashboardPage(userName: getName(givenEmail)),
-                          ),
-                        );
+                        Map<String, dynamic> res;
+                        res = await signInUser(givenEmail, givenPassword);
+                        bool singedIn = res['success'];
+                        String message = res['str'];
+                        singedIn
+                            ? Navigator.pushReplacement(
+                                context,
+                                PageTransition(
+                                  type: PageTransitionType.rightToLeftWithFade,
+                                  curve: Curves.fastOutSlowIn,
+                                  duration: Duration(milliseconds: 400),
+                                  child: DashboardPage(
+                                    userName: getName(givenEmail),
+                                  ),
+                                ),
+                              )
+                            : ScaffoldMessenger.of(
+                                context,
+                              ).showSnackBar(SnackBar(content: Text(message)));
                       }
                     },
                     backgroundColor: Colors.blue.shade800,
