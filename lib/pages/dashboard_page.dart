@@ -21,9 +21,6 @@ class DashboardPage extends StatefulWidget {
 class DashboardPageState extends State<DashboardPage> {
   int donation = 0;
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  String getUserName() {
-    return widget.userName;
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -4,6 +4,7 @@ import 'package:dashboard_app/firebase_auth_functions/authenticate_users.dart';
 import 'package:dashboard_app/firebase_options.dart';
 import 'package:dashboard_app/pages/dashboard_page.dart';
 import 'package:dashboard_app/pages/signup_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
@@ -27,19 +28,18 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: HomePage(),
-      // StreamBuilder(
-      //   stream: FirebaseAuth.instance.authStateChanges(),
-      //   builder: (context, snapshot) {
-      //     if (snapshot.hasData) {
-      //       return DashboardPage(
-      //         userName: HomePageState.givenEmail.split("@").first,
-      //       );
-      //     } else {
-      //       return HomePage();
-      //     }
-      //   },
-      // ),
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final user = snapshot.data as User;
+            final userName = user.email!.split("@").first;
+            return DashboardPage(userName: userName);
+          } else {
+            return HomePage();
+          }
+        },
+      ),
     );
   }
 }
@@ -51,7 +51,7 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  static String givenEmail = "";
+  String givenEmail = "";
   String? givenPassword;
   final formKey = GlobalKey<FormState>();
 
