@@ -1,10 +1,14 @@
+import 'package:dashboard_app/custom_widgets/custom_button.dart';
+import 'package:dashboard_app/custom_widgets/custom_input_text_field.dart';
 import 'package:dashboard_app/custom_widgets/custom_listtile.dart';
 import 'package:dashboard_app/custom_widgets/custom_text.dart';
 import 'package:dashboard_app/pages/announcement_page.dart';
 import 'package:dashboard_app/pages/leaderboard_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:page_transition/page_transition.dart';
+
+import '../main.dart';
 
 class DashboardPage extends StatefulWidget {
   final String userName;
@@ -15,6 +19,8 @@ class DashboardPage extends StatefulWidget {
 }
 
 class DashboardPageState extends State<DashboardPage> {
+  int donation = 0;
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +34,7 @@ class DashboardPageState extends State<DashboardPage> {
             PopupMenuButton(
               iconColor: Colors.white,
               color: Colors.white,
-              onSelected: (value) {
+              onSelected: (value) async {
                 if (value == "Announcements") {
                   Navigator.push(
                     context,
@@ -49,8 +55,17 @@ class DashboardPageState extends State<DashboardPage> {
                       child: LeaderboardPage(),
                     ),
                   );
-                } else if (value == "Exit") {
-                  SystemNavigator.pop();
+                } else if (value == "Logout") {
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.pushReplacement(
+                    context,
+                    PageTransition(
+                      type: PageTransitionType.leftToRight,
+                      curve: Curves.fastOutSlowIn,
+                      duration: Duration(milliseconds: 400),
+                      child: HomePage(),
+                    ),
+                  );
                 }
               },
               itemBuilder: (BuildContext context) => [
@@ -69,8 +84,8 @@ class DashboardPageState extends State<DashboardPage> {
                   ),
                 ),
                 PopupMenuItem(
-                  value: "Exit",
-                  child: CustomText(text: "Exit", textColor: Colors.black),
+                  value: "Logout",
+                  child: CustomText(text: "Logout", textColor: Colors.black),
                 ),
               ],
             ),
@@ -106,11 +121,83 @@ class DashboardPageState extends State<DashboardPage> {
               textColor: Colors.black,
               textBoldness: FontWeight.bold,
             ),
-            CustomText(
-              text: '₹5,000',
-              textSize: 25,
-              textColor: Colors.black,
-              textBoldness: FontWeight.bold,
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CustomText(
+                  text: '₹$donation',
+                  textSize: 25,
+                  textColor: Colors.black,
+                  textBoldness: FontWeight.bold,
+                ),
+                CustomButton(
+                  buttonText: "Donate",
+                  backgroundColor: Colors.blue.shade700,
+                  callback: () {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return BottomSheet(
+                          onClosing: () {},
+                          builder: (BuildContext context) {
+                            return Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  CustomText(
+                                    text: "Enter Donation Amount",
+                                    textSize: 30,
+                                    textColor: Colors.black,
+                                    textBoldness: FontWeight.bold,
+                                  ),
+                                  SizedBox(height: 20),
+                                  Form(
+                                    key: formKey,
+                                    child: CustomFormTextField(
+                                      cursorColor: Colors.black,
+                                      inputType: TextInputType.number,
+                                      hintText: 'Enter amount here',
+                                      icon: Icon(Icons.currency_rupee_rounded),
+                                      validate: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return "Please enter a donation amount";
+                                        }
+
+                                        if (!RegExp(r'^\d+$').hasMatch(value)) {
+                                          return "Please enter numbers only";
+                                        }
+                                        return null;
+                                      },
+                                      savedValue: (String? value) {
+                                        donation += int.parse(value!);
+                                        setState(() {});
+                                        return null;
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(height: 20),
+                                  CustomButton(
+                                    backgroundColor: Colors.green,
+                                    buttonText: "Donate",
+                                    callback: () {
+                                      if (formKey.currentState!.validate()) {
+                                        formKey.currentState!.save();
+                                        Navigator.pop(context);
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
             ),
             SizedBox(height: 20),
             Divider(),

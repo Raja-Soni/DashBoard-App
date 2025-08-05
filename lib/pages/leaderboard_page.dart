@@ -11,11 +11,11 @@ class LeaderboardPage extends StatefulWidget {
 
 class LeaderboardPageState extends State<LeaderboardPage> {
   List<Map<String, String>> topDonors = [
-    {'name': 'Aarav Mehta', 'donated': '₹72,500'},
-    {'name': 'Sneha Reddy', 'donated': '₹45,000'},
     {'name': 'Ishaan Verma', 'donated': '₹91,200'},
-    {'name': 'Priya Kapoor', 'donated': '₹18,750'},
+    {'name': 'Aarav Mehta', 'donated': '₹72,500'},
     {'name': 'Rohit Nair', 'donated': '₹66,300'},
+    {'name': 'Sneha Reddy', 'donated': '₹45,000'},
+    {'name': 'Priya Kapoor', 'donated': '₹18,750'},
   ];
 
   @override
