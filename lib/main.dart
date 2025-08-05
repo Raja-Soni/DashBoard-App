@@ -27,7 +27,19 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: DashboardPage(userName: "raja"),
+      home: HomePage(),
+      // StreamBuilder(
+      //   stream: FirebaseAuth.instance.authStateChanges(),
+      //   builder: (context, snapshot) {
+      //     if (snapshot.hasData) {
+      //       return DashboardPage(
+      //         userName: HomePageState.givenEmail.split("@").first,
+      //       );
+      //     } else {
+      //       return HomePage();
+      //     }
+      //   },
+      // ),
     );
   }
 }
@@ -39,7 +51,7 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  String givenEmail = "";
+  static String givenEmail = "";
   String? givenPassword;
   final formKey = GlobalKey<FormState>();
 
@@ -50,139 +62,142 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Container(
-            height: 200,
-            color: Colors.blue.shade800,
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.only(top: 100.0),
-                child: CustomText(
-                  textSize: 40,
-                  text: "Login",
-                  textBoldness: FontWeight.bold,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              height: 200,
+              color: Colors.blue.shade800,
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 100.0),
+                  child: CustomText(
+                    textSize: 40,
+                    text: "Login",
+                    textBoldness: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Form(
-              key: formKey,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 20.0, top: 100.0),
-                    child: CustomText(
-                      text: "Welcome!",
-                      textBoldness: FontWeight.bold,
-                      textColor: Colors.black,
-                      textSize: 45,
-                    ),
-                  ),
-                  CustomFormTextField(
-                    hintText: 'Email',
-                    inputType: TextInputType.emailAddress,
-                    icon: Icon(Icons.email_outlined),
-                    validate: (String? value) {
-                      final emailRegex = RegExp(
-                        r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$',
-                      );
-                      if (value == null || value.isEmpty) {
-                        return "Please Enter Your Email";
-                      } else if (!emailRegex.hasMatch(value)) {
-                        return 'Please enter a valid email';
-                      }
-                      return null;
-                    },
-                    savedValue: (String? value) {
-                      givenEmail = value.toString().trim();
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 10),
-                  CustomFormTextField(
-                    hintText: 'Password',
-                    inputType: TextInputType.visiblePassword,
-                    icon: Icon(Icons.password_outlined),
-                    validate: (String? value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please Enter Your Password";
-                      } else if (value.length <= 5) {
-                        return "Password must be more than 5 characters";
-                      }
-                      return null;
-                    },
-                    savedValue: (String? value) {
-                      givenPassword = value.toString().trim();
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 30),
-                  CustomButton(
-                    buttonText: "LOG IN",
-                    callback: () async {
-                      bool isValidate = formKey.currentState!.validate();
-                      if (isValidate) {
-                        formKey.currentState!.save();
-                        Map<String, dynamic> res;
-                        res = await signInUser(givenEmail, givenPassword);
-                        bool singedIn = res['success'];
-                        String message = res['str'];
-                        singedIn
-                            ? Navigator.pushReplacement(
-                                context,
-                                PageTransition(
-                                  type: PageTransitionType.rightToLeftWithFade,
-                                  curve: Curves.fastOutSlowIn,
-                                  duration: Duration(milliseconds: 400),
-                                  child: DashboardPage(
-                                    userName: getName(givenEmail),
-                                  ),
-                                ),
-                              )
-                            : ScaffoldMessenger.of(
-                                context,
-                              ).showSnackBar(SnackBar(content: Text(message)));
-                      }
-                    },
-                    backgroundColor: Colors.blue.shade800,
-                  ),
-                  SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CustomText(
-                        text: "Don't have an account?",
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 20.0, top: 100.0),
+                      child: CustomText(
+                        text: "Welcome!",
+                        textBoldness: FontWeight.bold,
                         textColor: Colors.black,
-                        textSize: 25,
+                        textSize: 45,
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            PageTransition(
-                              type: PageTransitionType.rightToLeft,
-                              curve: Curves.fastOutSlowIn,
-                              duration: Duration(milliseconds: 400),
-                              child: SignupPage(),
-                            ),
-                          );
-                        },
-                        child: CustomText(
-                          textColor: Colors.blue,
-                          text: "Sign Up",
+                    ),
+                    CustomFormTextField(
+                      hintText: 'Email',
+                      inputType: TextInputType.emailAddress,
+                      icon: Icon(Icons.email_outlined),
+                      validate: (String? value) {
+                        final emailRegex = RegExp(
+                          r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$',
+                        );
+                        if (value == null || value.isEmpty) {
+                          return "Please Enter Your Email";
+                        } else if (!emailRegex.hasMatch(value)) {
+                          return 'Please enter a valid email';
+                        }
+                        return null;
+                      },
+                      savedValue: (String? value) {
+                        givenEmail = value.toString().trim();
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    CustomFormTextField(
+                      hintText: 'Password',
+                      inputType: TextInputType.visiblePassword,
+                      icon: Icon(Icons.password_outlined),
+                      validate: (String? value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please Enter Your Password";
+                        } else if (value.length <= 5) {
+                          return "Password must be more than 5 characters";
+                        }
+                        return null;
+                      },
+                      savedValue: (String? value) {
+                        givenPassword = value.toString().trim();
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 30),
+                    CustomButton(
+                      buttonText: "LOG IN",
+                      callback: () async {
+                        bool isValidate = formKey.currentState!.validate();
+                        if (isValidate) {
+                          formKey.currentState!.save();
+                          Map<String, dynamic> res;
+                          res = await signInUser(givenEmail, givenPassword);
+                          bool singedIn = res['success'];
+                          String message = res['str'];
+                          singedIn
+                              ? Navigator.pushReplacement(
+                                  context,
+                                  PageTransition(
+                                    type:
+                                        PageTransitionType.rightToLeftWithFade,
+                                    curve: Curves.fastOutSlowIn,
+                                    duration: Duration(milliseconds: 400),
+                                    child: DashboardPage(
+                                      userName: getName(givenEmail),
+                                    ),
+                                  ),
+                                )
+                              : ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(message)),
+                                );
+                        }
+                      },
+                      backgroundColor: Colors.blue.shade800,
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CustomText(
+                          text: "Don't have an account?",
+                          textColor: Colors.black,
                           textSize: 25,
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              PageTransition(
+                                type: PageTransitionType.rightToLeft,
+                                curve: Curves.fastOutSlowIn,
+                                duration: Duration(milliseconds: 400),
+                                child: SignupPage(),
+                              ),
+                            );
+                          },
+                          child: CustomText(
+                            textColor: Colors.blue,
+                            text: "Sign Up",
+                            textSize: 25,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

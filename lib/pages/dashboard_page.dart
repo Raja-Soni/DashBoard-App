@@ -21,6 +21,10 @@ class DashboardPage extends StatefulWidget {
 class DashboardPageState extends State<DashboardPage> {
   int donation = 0;
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  String getUserName() {
+    return widget.userName;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -186,6 +190,14 @@ class DashboardPageState extends State<DashboardPage> {
                                         formKey.currentState!.save();
                                         Navigator.pop(context);
                                       }
+                                    },
+                                  ),
+                                  SizedBox(height: 20),
+                                  CustomButton(
+                                    backgroundColor: Colors.red,
+                                    buttonText: "Cancel",
+                                    callback: () {
+                                      Navigator.pop(context);
                                     },
                                   ),
                                 ],
