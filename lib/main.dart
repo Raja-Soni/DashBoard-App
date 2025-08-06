@@ -1,6 +1,6 @@
 import 'package:dashboard_app/custom_widgets/custom_button.dart';
 import 'package:dashboard_app/custom_widgets/custom_text.dart';
-import 'package:dashboard_app/firebase_auth_functions/authenticate_users.dart';
+import 'package:dashboard_app/firebase_functions/authenticate_users.dart';
 import 'package:dashboard_app/firebase_options.dart';
 import 'package:dashboard_app/pages/dashboard_page.dart';
 import 'package:dashboard_app/pages/signup_page.dart';
@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
           if (snapshot.hasData) {
             final user = snapshot.data as User;
             final userName = user.email!.split("@").first;
-            return DashboardPage(userName: userName);
+            return DashboardPage(userName: userName, email: user.email!);
           } else {
             return HomePage();
           }
@@ -153,6 +153,7 @@ class HomePageState extends State<HomePage> {
                                     duration: Duration(milliseconds: 400),
                                     child: DashboardPage(
                                       userName: getName(givenEmail),
+                                      email: givenEmail,
                                     ),
                                   ),
                                 )

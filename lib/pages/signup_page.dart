@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
 import '../custom_widgets/custom_input_text_field.dart';
-import '../firebase_auth_functions/authenticate_users.dart';
+import '../firebase_functions/authenticate_users.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -134,7 +134,10 @@ class SignupPageState extends State<SignupPage> {
                               type: PageTransitionType.rightToLeftWithFade,
                               curve: Curves.fastOutSlowIn,
                               duration: Duration(milliseconds: 400),
-                              child: DashboardPage(userName: name),
+                              child: DashboardPage(
+                                userName: name,
+                                email: givenEmail,
+                              ),
                             ),
                           );
                         }

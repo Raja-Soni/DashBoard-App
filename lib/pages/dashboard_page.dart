@@ -1,5 +1,4 @@
-import 'package:dashboard_app/custom_widgets/custom_button.dart';
-import 'package:dashboard_app/custom_widgets/custom_input_text_field.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashboard_app/custom_widgets/custom_listtile.dart';
 import 'package:dashboard_app/custom_widgets/custom_text.dart';
 import 'package:dashboard_app/pages/announcement_page.dart';
@@ -8,11 +7,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
+import '../custom_widgets/custom_button.dart';
+import '../custom_widgets/custom_input_text_field.dart';
+import '../firebase_functions/crud_users.dart';
 import '../main.dart';
 
 class DashboardPage extends StatefulWidget {
   final String userName;
-  const DashboardPage({super.key, required this.userName});
+  final String? email;
+  const DashboardPage({super.key, required this.userName, this.email});
 
   @override
   State<DashboardPage> createState() => DashboardPageState();
@@ -24,6 +27,9 @@ class DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    String name =
+        widget.userName[0].toUpperCase() +
+        widget.userName.toLowerCase().substring(1);
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -101,15 +107,13 @@ class DashboardPageState extends State<DashboardPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             CustomText(
-              text:
-                  widget.userName[0].toUpperCase() +
-                  widget.userName.toLowerCase().substring(1),
+              text: name,
               textSize: 40,
               textBoldness: FontWeight.bold,
               textColor: Colors.black,
             ),
             CustomText(
-              text: '${widget.userName}12345',
+              text: '${name}12345',
               textSize: 20,
               textColor: Colors.grey.shade700,
             ),
@@ -122,91 +126,112 @@ class DashboardPageState extends State<DashboardPage> {
               textColor: Colors.black,
               textBoldness: FontWeight.bold,
             ),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CustomText(
-                  text: '₹$donation',
-                  textSize: 25,
-                  textColor: Colors.black,
-                  textBoldness: FontWeight.bold,
-                ),
-                CustomButton(
-                  buttonText: "Donate",
-                  backgroundColor: Colors.blue.shade700,
-                  callback: () {
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (context) {
-                        return BottomSheet(
-                          onClosing: () {},
-                          builder: (BuildContext context) {
-                            return Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  CustomText(
-                                    text: "Enter Donation Amount",
-                                    textSize: 30,
-                                    textColor: Colors.black,
-                                    textBoldness: FontWeight.bold,
-                                  ),
-                                  SizedBox(height: 20),
-                                  Form(
-                                    key: formKey,
-                                    child: CustomFormTextField(
-                                      cursorColor: Colors.black,
-                                      inputType: TextInputType.number,
-                                      hintText: 'Enter amount here',
-                                      icon: Icon(Icons.currency_rupee_rounded),
-                                      validate: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return "Please enter a donation amount";
-                                        }
-
-                                        if (!RegExp(r'^\d+$').hasMatch(value)) {
-                                          return "Please enter numbers only";
-                                        }
-                                        return null;
-                                      },
-                                      savedValue: (String? value) {
-                                        donation += int.parse(value!);
-                                        setState(() {});
-                                        return null;
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(height: 20),
-                                  CustomButton(
-                                    backgroundColor: Colors.green,
-                                    buttonText: "Donate",
-                                    callback: () {
-                                      if (formKey.currentState!.validate()) {
-                                        formKey.currentState!.save();
-                                        Navigator.pop(context);
-                                      }
-                                    },
-                                  ),
-                                  SizedBox(height: 20),
-                                  CustomButton(
-                                    backgroundColor: Colors.red,
-                                    buttonText: "Cancel",
-                                    callback: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ],
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection("Donators")
+                  .where('name', isEqualTo: name)
+                  .snapshots(),
+              builder: (context, donatorsSnapshot) {
+                if (donatorsSnapshot.connectionState ==
+                    ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else {
+                  final donatedAmount =
+                      donatorsSnapshot.data!.docs.first['donation'];
+                  return CustomText(
+                    text:
+                        donatorsSnapshot.hasData == false ||
+                            donatorsSnapshot.data!.docs.isEmpty
+                        ? '₹0'
+                        : '₹$donatedAmount',
+                    textSize: 25,
+                    textColor: Colors.black,
+                    textBoldness: FontWeight.bold,
+                  );
+                }
+              },
+            ),
+            CustomButton(
+              buttonText: "Donate",
+              backgroundColor: Colors.blue.shade700,
+              callback: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) {
+                    return BottomSheet(
+                      onClosing: () {},
+                      builder: (BuildContext context) {
+                        return Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              CustomText(
+                                text: "Enter Donation Amount",
+                                textSize: 30,
+                                textColor: Colors.black,
+                                textBoldness: FontWeight.bold,
                               ),
-                            );
-                          },
+                              SizedBox(height: 20),
+                              Form(
+                                key: formKey,
+                                child: CustomFormTextField(
+                                  cursorColor: Colors.black,
+                                  inputType: TextInputType.number,
+                                  hintText: 'Enter amount here',
+                                  icon: Icon(Icons.currency_rupee_rounded),
+                                  validate: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "Please enter a donation amount";
+                                    }
+
+                                    if (!RegExp(r'^\d+$').hasMatch(value)) {
+                                      return "Please enter numbers only";
+                                    }
+                                    return null;
+                                  },
+                                  savedValue: (String? value) {
+                                    donation += int.parse(value!);
+                                    setState(() {});
+                                    return null;
+                                  },
+                                ),
+                              ),
+                              SizedBox(height: 20),
+                              CustomButton(
+                                backgroundColor: Colors.green,
+                                buttonText: "Donate",
+                                callback: () {
+                                  if (formKey.currentState!.validate()) {
+                                    formKey.currentState!.save();
+                                    create(
+                                      widget.userName[0].toUpperCase() +
+                                          widget.userName
+                                              .toLowerCase()
+                                              .substring(1),
+                                      donation,
+                                      widget.email!,
+                                    );
+                                    Navigator.pop(context);
+                                  }
+                                },
+                              ),
+                              SizedBox(height: 20),
+                              CustomButton(
+                                backgroundColor: Colors.red,
+                                buttonText: "Cancel",
+                                callback: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
+                          ),
                         );
                       },
                     );
                   },
-                ),
-              ],
+                );
+              },
             ),
             SizedBox(height: 20),
             Divider(),
