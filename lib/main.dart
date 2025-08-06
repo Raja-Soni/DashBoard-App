@@ -135,6 +135,7 @@ class HomePageState extends State<HomePage> {
                     SizedBox(height: 30),
                     CustomButton(
                       buttonText: "LOG IN",
+                      buttonWidth: MediaQuery.of(context).size.width,
                       callback: () async {
                         bool isValidate = formKey.currentState!.validate();
                         if (isValidate) {

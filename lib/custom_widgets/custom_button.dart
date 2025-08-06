@@ -11,6 +11,8 @@ class CustomButton extends StatelessWidget {
   final Color borderColor;
   final double textSize;
   final String buttonText;
+  final double? buttonHeight;
+  final double? buttonWidth;
   final Color textColor;
   final FontWeight textBoldness;
   final VoidCallback callback;
@@ -30,13 +32,15 @@ class CustomButton extends StatelessWidget {
     this.textColor = Colors.white,
     this.textBoldness = FontWeight.bold,
     this.givenHeroTag,
+    this.buttonHeight = 50,
+    this.buttonWidth = 150,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 50,
-      width: 150,
+      height: buttonHeight,
+      width: buttonWidth,
       child: FloatingActionButton(
         heroTag: givenHeroTag,
         onPressed: () {

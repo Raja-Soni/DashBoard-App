@@ -4,7 +4,6 @@ signUpNewUser(String uEmail, uPassword) async {
   try {
     final credential = await FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: uEmail, password: uPassword);
-    print("///////////////  User Added ////////////////");
   } on FirebaseAuthException catch (e) {
     if (e.code == 'weak-password') {
       print('The password provided is too weak.');
@@ -12,7 +11,7 @@ signUpNewUser(String uEmail, uPassword) async {
       print('The account already exists for that email.');
     }
   } catch (e) {
-    print("?????????????? $e ???????????????????");
+    print(e);
   }
 }
 
@@ -25,7 +24,6 @@ Future<Map<String, dynamic>> signInUser(String uEmail, uPassword) async {
       password: uPassword,
     );
     result['success'] = true;
-    print("///////////////  Logged In ////////////////");
   } on FirebaseAuthException catch (e) {
     if (e.code == 'user-not-found') {
       result['success'] = false;

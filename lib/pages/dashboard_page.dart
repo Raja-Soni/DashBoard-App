@@ -101,7 +101,7 @@ class DashboardPageState extends State<DashboardPage> {
         backgroundColor: Colors.blue.shade800,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(30.0),
+        padding: const EdgeInsets.all(25.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -136,23 +136,23 @@ class DashboardPageState extends State<DashboardPage> {
                     ConnectionState.waiting) {
                   return CircularProgressIndicator();
                 } else {
-                  final donatedAmount =
-                      donatorsSnapshot.data!.docs.first['donation'];
                   return CustomText(
                     text:
                         donatorsSnapshot.hasData == false ||
                             donatorsSnapshot.data!.docs.isEmpty
                         ? '₹0'
-                        : '₹$donatedAmount',
-                    textSize: 25,
+                        : '₹ ${donatorsSnapshot.data!.docs.first['donation']}',
+                    textSize: 30,
                     textColor: Colors.black,
-                    textBoldness: FontWeight.bold,
                   );
                 }
               },
             ),
+            SizedBox(height: 10),
             CustomButton(
               buttonText: "Donate",
+              textSize: 25,
+              buttonWidth: MediaQuery.of(context).size.width,
               backgroundColor: Colors.blue.shade700,
               callback: () {
                 showModalBottomSheet(
@@ -199,6 +199,7 @@ class DashboardPageState extends State<DashboardPage> {
                               ),
                               SizedBox(height: 20),
                               CustomButton(
+                                buttonWidth: MediaQuery.of(context).size.width,
                                 backgroundColor: Colors.green,
                                 buttonText: "Donate",
                                 callback: () {
@@ -218,6 +219,7 @@ class DashboardPageState extends State<DashboardPage> {
                               ),
                               SizedBox(height: 20),
                               CustomButton(
+                                buttonWidth: MediaQuery.of(context).size.width,
                                 backgroundColor: Colors.red,
                                 buttonText: "Cancel",
                                 callback: () {

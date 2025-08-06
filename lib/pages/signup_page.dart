@@ -119,6 +119,7 @@ class SignupPageState extends State<SignupPage> {
                     SizedBox(height: 30),
                     CustomButton(
                       buttonText: "Sign Up",
+                      buttonWidth: MediaQuery.of(context).size.width,
                       callback: () {
                         bool isValidate = singUpFormKey.currentState!
                             .validate();
