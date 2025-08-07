@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashboard_app/custom_widgets/custom_container.dart';
 import 'package:dashboard_app/custom_widgets/custom_text.dart';
 import 'package:flutter/material.dart';
@@ -56,45 +57,58 @@ class LeaderboardPageState extends State<LeaderboardPage> {
                 child: CustomContainer(
                   borderRadius: 10.0,
                   backgroundColor: Colors.blue.shade100,
-                  child: ListView.builder(
-                    itemCount: topDonors.length,
-                    itemBuilder: (BuildContext context, int index) => Padding(
-                      padding: const EdgeInsets.only(
-                        left: 8.0,
-                        right: 8.0,
-                        top: 8.0,
-                      ),
-                      child: Card(
-                        color: Colors.grey.shade100,
-                        child: ListTile(
-                          leading: CustomText(
-                            text: "${index + 1}",
-                            textColor: Colors.black,
-                            textSize: 22,
-                          ),
-                          title: Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 15,
-                                backgroundColor: Colors.grey.shade400,
-                                child: Icon(Icons.person_2_outlined),
+                  child: StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('Donators')
+                        .snapshots(),
+                    builder: (context, firebaseSnapshot) {
+                      final donDocs = firebaseSnapshot.data!.docs;
+                      donDocs.sort(
+                        (a, b) => b['donation'].compareTo(a['donation']),
+                      );
+                      return ListView.builder(
+                        itemCount: donDocs.length,
+                        itemBuilder: (BuildContext context, int index) =>
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                left: 8.0,
+                                right: 8.0,
+                                top: 8.0,
                               ),
-                              SizedBox(width: 8),
-                              CustomText(
-                                text: topDonors[index]['name']!,
-                                textColor: Colors.black,
-                                textSize: 23,
+                              child: Card(
+                                color: Colors.grey.shade100,
+                                child: ListTile(
+                                  leading: CustomText(
+                                    text: "${index + 1}",
+                                    textColor: Colors.black,
+                                    textSize: 22,
+                                  ),
+                                  title: Row(
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 15,
+                                        backgroundColor: Colors.grey.shade400,
+                                        child: Icon(Icons.person_2_outlined),
+                                      ),
+                                      SizedBox(width: 8),
+                                      CustomText(
+                                        text: donDocs[index]['name'],
+
+                                        textColor: Colors.black,
+                                        textSize: 23,
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: CustomText(
+                                    text: '₹${donDocs[index]['donation']}',
+                                    textColor: Colors.black,
+                                    textSize: 25,
+                                  ),
+                                ),
                               ),
-                            ],
-                          ),
-                          trailing: CustomText(
-                            text: topDonors[index]['donated']!,
-                            textColor: Colors.black,
-                            textSize: 25,
-                          ),
-                        ),
-                      ),
-                    ),
+                            ),
+                      );
+                    },
                   ),
                 ),
               ),
