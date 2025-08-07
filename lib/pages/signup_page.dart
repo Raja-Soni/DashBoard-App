@@ -1,7 +1,6 @@
 import 'package:dashboard_app/custom_widgets/custom_button.dart';
 import 'package:dashboard_app/custom_widgets/custom_text.dart';
 import 'package:dashboard_app/main.dart';
-import 'package:dashboard_app/pages/dashboard_page.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -125,9 +124,6 @@ class SignupPageState extends State<SignupPage> {
                             .validate();
                         if (isValidate) {
                           singUpFormKey.currentState!.save();
-                          String name =
-                              givenName[0].toUpperCase() +
-                              givenName.toLowerCase().substring(1);
                           signUpNewUser(givenEmail, givenPassword);
                           Navigator.pushReplacement(
                             context,
@@ -135,10 +131,7 @@ class SignupPageState extends State<SignupPage> {
                               type: PageTransitionType.rightToLeftWithFade,
                               curve: Curves.fastOutSlowIn,
                               duration: Duration(milliseconds: 400),
-                              child: DashboardPage(
-                                userName: name,
-                                email: givenEmail,
-                              ),
+                              child: HomePage(),
                             ),
                           );
                         }

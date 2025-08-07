@@ -20,6 +20,7 @@ class CustomFormTextField extends StatelessWidget {
   final Color iconColor;
   final FormFieldValidator<String>? validate;
   final FormFieldValidator<String>? savedValue;
+  final TextEditingController? controller;
 
   const CustomFormTextField({
     super.key,
@@ -42,11 +43,13 @@ class CustomFormTextField extends StatelessWidget {
     this.iconColor = Colors.black,
     required this.validate,
     required this.savedValue,
+    this.controller,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: controller,
       validator: validate,
       onSaved: savedValue,
       style: TextStyle(color: textColor),

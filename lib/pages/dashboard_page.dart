@@ -24,6 +24,7 @@ class DashboardPage extends StatefulWidget {
 class DashboardPageState extends State<DashboardPage> {
   int donation = 0;
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final tffController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -101,19 +102,19 @@ class DashboardPageState extends State<DashboardPage> {
         backgroundColor: Colors.blue.shade800,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(25.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             CustomText(
-              text: name,
-              textSize: 40,
+              text: 'Name: $name',
+              textSize: 35,
               textBoldness: FontWeight.bold,
               textColor: Colors.black,
             ),
             CustomText(
-              text: '${name}12345',
+              text: 'Referral Code: ${name}12345',
               textSize: 20,
               textColor: Colors.grey.shade700,
             ),
@@ -129,7 +130,7 @@ class DashboardPageState extends State<DashboardPage> {
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection("Donators")
-                  .where('name', isEqualTo: name)
+                  .where('email', isEqualTo: widget.email)
                   .snapshots(),
               builder: (context, donatorsSnapshot) {
                 if (donatorsSnapshot.connectionState ==
@@ -176,6 +177,7 @@ class DashboardPageState extends State<DashboardPage> {
                               Form(
                                 key: formKey,
                                 child: CustomFormTextField(
+                                  controller: tffController,
                                   cursorColor: Colors.black,
                                   inputType: TextInputType.number,
                                   hintText: 'Enter amount here',
@@ -191,8 +193,7 @@ class DashboardPageState extends State<DashboardPage> {
                                     return null;
                                   },
                                   savedValue: (String? value) {
-                                    donation += int.parse(value!);
-                                    setState(() {});
+                                    donation = int.parse(value!);
                                     return null;
                                   },
                                 ),
@@ -202,7 +203,7 @@ class DashboardPageState extends State<DashboardPage> {
                                 buttonWidth: MediaQuery.of(context).size.width,
                                 backgroundColor: Colors.green,
                                 buttonText: "Donate",
-                                callback: () {
+                                callback: () async {
                                   if (formKey.currentState!.validate()) {
                                     formKey.currentState!.save();
                                     create(
@@ -213,6 +214,7 @@ class DashboardPageState extends State<DashboardPage> {
                                       donation,
                                       widget.email!,
                                     );
+                                    tffController.clear();
                                     Navigator.pop(context);
                                   }
                                 },

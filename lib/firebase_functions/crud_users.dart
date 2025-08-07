@@ -1,8 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 create(String name, int donation, String email) async {
-  await FirebaseFirestore.instance.collection("Donators").doc(email).set({
-    'name': name,
-    'donation': donation,
-  });
+  final check = await FirebaseFirestore.instance
+      .collection("Donators")
+      .doc(email)
+      .get();
+  if (check.exists) {
+    // final oldTotalDonation = check.data()?['donation'] ?? 0;
+    final oldTotalDonation = check['donation'];
+    final newTotalDonation = oldTotalDonation + donation;
+    await FirebaseFirestore.instance.collection("Donators").doc(email).update({
+      'name': name,
+      'donation': newTotalDonation,
+    });
+  } else {
+    await FirebaseFirestore.instance.collection("Donators").doc(email).set({
+      'name': name,
+      'donation': donation,
+      'email': email,
+    });
+  }
 }
