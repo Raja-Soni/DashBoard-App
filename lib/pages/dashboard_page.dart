@@ -108,7 +108,7 @@ class DashboardPageState extends State<DashboardPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             CustomText(
-              text: 'Name: $name',
+              text: '$name',
               textSize: 35,
               textBoldness: FontWeight.bold,
               textColor: Colors.black,
