@@ -140,10 +140,13 @@ class HomePageState extends State<HomePage> {
                         bool isValidate = formKey.currentState!.validate();
                         if (isValidate) {
                           formKey.currentState!.save();
-                          Map<String, dynamic> res;
-                          res = await signInUser(givenEmail, givenPassword);
+                          Map<String, dynamic> res = await signInUser(
+                            givenEmail,
+                            givenPassword,
+                          );
                           bool singedIn = res['success'];
                           String message = res['str'];
+
                           singedIn
                               ? Navigator.pushReplacement(
                                   context,

@@ -6,7 +6,6 @@ create(String name, int donation, String email) async {
       .doc(email)
       .get();
   if (check.exists) {
-    // final oldTotalDonation = check.data()?['donation'] ?? 0;
     final oldTotalDonation = check['donation'];
     final newTotalDonation = oldTotalDonation + donation;
     await FirebaseFirestore.instance.collection("Donators").doc(email).update({

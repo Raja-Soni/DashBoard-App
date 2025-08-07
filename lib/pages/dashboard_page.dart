@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dashboard_app/custom_widgets/custom_container.dart';
 import 'package:dashboard_app/custom_widgets/custom_listtile.dart';
 import 'package:dashboard_app/custom_widgets/custom_text.dart';
 import 'package:dashboard_app/pages/announcement_page.dart';
@@ -31,289 +32,305 @@ class DashboardPageState extends State<DashboardPage> {
     String name =
         widget.userName[0].toUpperCase() +
         widget.userName.toLowerCase().substring(1);
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Row(
-          children: [
-            Icon(Icons.dashboard, color: Colors.white, size: 30),
-            SizedBox(width: 10),
-            Expanded(child: CustomText(text: "DashBoard", textSize: 30)),
-            PopupMenuButton(
-              iconColor: Colors.white,
-              color: Colors.white,
-              onSelected: (value) async {
-                if (value == "Announcements") {
-                  Navigator.push(
-                    context,
-                    PageTransition(
-                      type: PageTransitionType.rightToLeftWithFade,
-                      curve: Curves.fastOutSlowIn,
-                      duration: Duration(milliseconds: 400),
-                      child: AnnouncementPage(),
-                    ),
-                  );
-                } else if (value == "Leader Board") {
-                  Navigator.push(
-                    context,
-                    PageTransition(
-                      type: PageTransitionType.rightToLeftWithFade,
-                      curve: Curves.fastOutSlowIn,
-                      duration: Duration(milliseconds: 400),
-                      child: LeaderboardPage(),
-                    ),
-                  );
-                } else if (value == "Logout") {
-                  await FirebaseAuth.instance.signOut();
-                  Navigator.pushReplacement(
-                    context,
-                    PageTransition(
-                      type: PageTransitionType.leftToRight,
-                      curve: Curves.fastOutSlowIn,
-                      duration: Duration(milliseconds: 400),
-                      child: HomePage(),
-                    ),
-                  );
-                }
-              },
-              itemBuilder: (BuildContext context) => [
-                PopupMenuItem(
-                  value: "Leader Board",
-                  child: CustomText(
-                    text: "Leader Board",
-                    textColor: Colors.black,
-                  ),
-                ),
-                PopupMenuItem(
-                  value: "Announcements",
-                  child: CustomText(
-                    text: "Announcements",
-                    textColor: Colors.black,
-                  ),
-                ),
-                PopupMenuItem(
-                  value: "Logout",
-                  child: CustomText(text: "Logout", textColor: Colors.black),
-                ),
-              ],
-            ),
-          ],
-        ),
-        backgroundColor: Colors.blue.shade800,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            CustomText(
-              text: '$name',
-              textSize: 35,
-              textBoldness: FontWeight.bold,
-              textColor: Colors.black,
-            ),
-            CustomText(
-              text: 'Referral Code: ${name}12345',
-              textSize: 20,
-              textColor: Colors.grey.shade700,
-            ),
-            SizedBox(height: 20),
-            Divider(),
-            SizedBox(height: 20),
-            CustomText(
-              text: 'Total Donation Raised',
-              textSize: 30,
-              textColor: Colors.black,
-              textBoldness: FontWeight.bold,
-            ),
-            StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection("Donators")
-                  .where('email', isEqualTo: widget.email)
-                  .snapshots(),
-              builder: (context, donatorsSnapshot) {
-                if (donatorsSnapshot.connectionState ==
-                    ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                } else {
-                  return CustomText(
-                    text:
-                        donatorsSnapshot.hasData == false ||
-                            donatorsSnapshot.data!.docs.isEmpty
-                        ? '₹0'
-                        : '₹ ${donatorsSnapshot.data!.docs.first['donation']}',
-                    textSize: 30,
-                    textColor: Colors.black,
-                  );
-                }
-              },
-            ),
-            SizedBox(height: 10),
-            CustomButton(
-              buttonText: "Donate",
-              textSize: 25,
-              buttonWidth: MediaQuery.of(context).size.width,
-              backgroundColor: Colors.blue.shade700,
-              callback: () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (context) {
-                    return BottomSheet(
-                      onClosing: () {},
-                      builder: (BuildContext context) {
-                        return Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              CustomText(
-                                text: "Enter Donation Amount",
-                                textSize: 30,
-                                textColor: Colors.black,
-                                textBoldness: FontWeight.bold,
-                              ),
-                              SizedBox(height: 20),
-                              Form(
-                                key: formKey,
-                                child: CustomFormTextField(
-                                  controller: tffController,
-                                  cursorColor: Colors.black,
-                                  inputType: TextInputType.number,
-                                  hintText: 'Enter amount here',
-                                  icon: Icon(Icons.currency_rupee_rounded),
-                                  validate: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return "Please enter a donation amount";
-                                    }
-
-                                    if (!RegExp(r'^\d+$').hasMatch(value)) {
-                                      return "Please enter numbers only";
-                                    }
-                                    return null;
-                                  },
-                                  savedValue: (String? value) {
-                                    donation = int.parse(value!);
-                                    return null;
-                                  },
-                                ),
-                              ),
-                              SizedBox(height: 20),
-                              CustomButton(
-                                buttonWidth: MediaQuery.of(context).size.width,
-                                backgroundColor: Colors.green,
-                                buttonText: "Donate",
-                                callback: () async {
-                                  if (formKey.currentState!.validate()) {
-                                    formKey.currentState!.save();
-                                    create(
-                                      widget.userName[0].toUpperCase() +
-                                          widget.userName
-                                              .toLowerCase()
-                                              .substring(1),
-                                      donation,
-                                      widget.email!,
-                                    );
-                                    tffController.clear();
-                                    Navigator.pop(context);
-                                  }
-                                },
-                              ),
-                              SizedBox(height: 20),
-                              CustomButton(
-                                buttonWidth: MediaQuery.of(context).size.width,
-                                backgroundColor: Colors.red,
-                                buttonText: "Cancel",
-                                callback: () {
-                                  Navigator.pop(context);
-                                },
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Row(
+            children: [
+              Icon(Icons.dashboard, color: Colors.white, size: 30),
+              SizedBox(width: 10),
+              Expanded(child: CustomText(text: "DashBoard", textSize: 30)),
+              PopupMenuButton(
+                iconColor: Colors.white,
+                color: Colors.white,
+                onSelected: (value) async {
+                  if (value == "Announcements") {
+                    Navigator.push(
+                      context,
+                      PageTransition(
+                        type: PageTransitionType.rightToLeftWithFade,
+                        curve: Curves.fastOutSlowIn,
+                        duration: Duration(milliseconds: 400),
+                        child: AnnouncementPage(),
+                      ),
                     );
-                  },
-                );
-              },
-            ),
-            SizedBox(height: 20),
-            Divider(),
-            SizedBox(height: 20),
-            CustomText(
-              text: 'Rewards/Unlockables',
-              textSize: 30,
-              textColor: Colors.black,
-              textBoldness: FontWeight.bold,
-            ),
-            SizedBox(height: 10),
-            Expanded(
-              child: ListView(
-                children: [
-                  CustomListTile(
-                    iconBgColor: Colors.pink.shade100,
-                    titleName: "Kindness Starter",
-                    subTitleName: "Donate ₹10,000 to unlock this reward",
-                    rewardIcon: Icon(
-                      Icons.volunteer_activism,
-                      size: 45,
-                      color: Colors.white,
+                  } else if (value == "Leader Board") {
+                    Navigator.push(
+                      context,
+                      PageTransition(
+                        type: PageTransitionType.rightToLeftWithFade,
+                        curve: Curves.fastOutSlowIn,
+                        duration: Duration(milliseconds: 400),
+                        child: LeaderboardPage(),
+                      ),
+                    );
+                  } else if (value == "Logout") {
+                    await FirebaseAuth.instance.signOut();
+                    Navigator.pushReplacement(
+                      context,
+                      PageTransition(
+                        type: PageTransitionType.leftToRight,
+                        curve: Curves.fastOutSlowIn,
+                        duration: Duration(milliseconds: 400),
+                        child: HomePage(),
+                      ),
+                    );
+                  }
+                },
+                itemBuilder: (BuildContext context) => [
+                  PopupMenuItem(
+                    value: "Leader Board",
+                    child: CustomText(
+                      text: "Leader Board",
+                      textColor: Colors.black,
                     ),
                   ),
-                  CustomListTile(
-                    iconBgColor: Colors.orange.shade200,
-                    titleName: "Generous Giver",
-                    subTitleName: "Donate ₹20,000 to unlock this reward",
-                    rewardIcon: Icon(
-                      Icons.star_rounded,
-                      size: 45,
-                      color: Colors.white,
+                  PopupMenuItem(
+                    value: "Announcements",
+                    child: CustomText(
+                      text: "Announcements",
+                      textColor: Colors.black,
                     ),
                   ),
-                  CustomListTile(
-                    iconBgColor: Colors.purple.shade100,
-                    titleName: "Hope Spreader",
-                    subTitleName: "Donate ₹30,000 to unlock this reward",
-                    rewardIcon: Icon(
-                      Icons.favorite,
-                      size: 45,
-                      color: Colors.white,
-                    ),
-                  ),
-                  CustomListTile(
-                    iconBgColor: Colors.blue.shade100,
-                    titleName: "Visionary Donor",
-                    subTitleName: "Donate ₹40,000 to unlock this reward",
-                    rewardIcon: Icon(
-                      Icons.diamond_outlined,
-                      size: 45,
-                      color: Colors.white,
-                    ),
-                  ),
-                  CustomListTile(
-                    iconBgColor: Colors.green.shade100,
-                    titleName: "Major Impact Maker",
-                    subTitleName: "Donate ₹80,000 to unlock this reward",
-                    rewardIcon: Icon(
-                      Icons.public,
-                      size: 45,
-                      color: Colors.white,
-                    ),
-                  ),
-                  CustomListTile(
-                    iconBgColor: Colors.cyan.shade100,
-                    titleName: "Major Supporter",
-                    subTitleName: "Donate ₹100,000 to unlock this reward",
-                    rewardIcon: Icon(
-                      Icons.military_tech,
-                      size: 45,
-                      color: Colors.white,
-                    ),
+                  PopupMenuItem(
+                    value: "Logout",
+                    child: CustomText(text: "Logout", textColor: Colors.black),
                   ),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
+          backgroundColor: Colors.blue.shade800,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              CustomText(
+                text: name,
+                textSize: 35,
+                textBoldness: FontWeight.bold,
+                textColor: Colors.black,
+              ),
+              CustomText(
+                text: 'Referral Code: ${name}12345',
+                textSize: 20,
+                textColor: Colors.grey.shade700,
+              ),
+              SizedBox(height: 20),
+              Divider(),
+              SizedBox(height: 20),
+              CustomText(
+                text: 'Total Donation Raised',
+                textSize: 30,
+                textColor: Colors.black,
+                textBoldness: FontWeight.bold,
+              ),
+              StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection("Donators")
+                    .where('email', isEqualTo: widget.email)
+                    .snapshots(),
+                builder: (context, donatorsSnapshot) {
+                  if (donatorsSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else {
+                    return CustomText(
+                      text:
+                          donatorsSnapshot.hasData == false ||
+                              donatorsSnapshot.data!.docs.isEmpty
+                          ? '₹0'
+                          : '₹ ${donatorsSnapshot.data!.docs.first['donation']}',
+                      textSize: 30,
+                      textColor: Colors.black,
+                    );
+                  }
+                },
+              ),
+              SizedBox(height: 10),
+              CustomButton(
+                buttonText: "Donate",
+                textSize: 25,
+                buttonWidth: MediaQuery.of(context).size.width,
+                backgroundColor: Colors.blue.shade700,
+                callback: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (context) {
+                      return BottomSheet(
+                        onClosing: () {},
+                        builder: (BuildContext context) {
+                          return Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                CustomText(
+                                  text: "Enter Donation Amount",
+                                  textSize: 30,
+                                  textColor: Colors.black,
+                                  textBoldness: FontWeight.bold,
+                                ),
+                                SizedBox(height: 20),
+                                Form(
+                                  key: formKey,
+                                  child: CustomFormTextField(
+                                    controller: tffController,
+                                    cursorColor: Colors.black,
+                                    inputType: TextInputType.number,
+                                    hintText: 'Enter amount here',
+                                    icon: Icon(Icons.currency_rupee_rounded),
+                                    validate: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return "Please enter a donation amount";
+                                      }
+
+                                      if (!RegExp(r'^\d+$').hasMatch(value)) {
+                                        return "Please enter numbers only";
+                                      }
+                                      return null;
+                                    },
+                                    savedValue: (String? value) {
+                                      donation = int.parse(value!);
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                                SizedBox(height: 20),
+                                CustomButton(
+                                  buttonWidth: MediaQuery.of(
+                                    context,
+                                  ).size.width,
+                                  backgroundColor: Colors.green,
+                                  buttonText: "Donate",
+                                  callback: () async {
+                                    if (formKey.currentState!.validate()) {
+                                      formKey.currentState!.save();
+                                      create(
+                                        widget.userName[0].toUpperCase() +
+                                            widget.userName
+                                                .toLowerCase()
+                                                .substring(1),
+                                        donation,
+                                        widget.email!,
+                                      );
+                                      tffController.clear();
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                ),
+                                SizedBox(height: 20),
+                                CustomButton(
+                                  buttonWidth: MediaQuery.of(
+                                    context,
+                                  ).size.width,
+                                  backgroundColor: Colors.red,
+                                  buttonText: "Cancel",
+                                  callback: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
+              SizedBox(height: 20),
+              Divider(),
+              SizedBox(height: 20),
+              CustomText(
+                text: 'Rewards/Unlockables',
+                textSize: 30,
+                textColor: Colors.black,
+                textBoldness: FontWeight.bold,
+              ),
+              SizedBox(height: 10),
+              Expanded(
+                child: CustomContainer(
+                  backgroundColor: Colors.grey.shade300,
+                  borderRadius: 10,
+                  child: ListView(
+                    padding: EdgeInsets.all(10.0),
+                    children: [
+                      CustomListTile(
+                        iconBgColor: Colors.pink.shade100,
+                        titleName: "Kindness Starter",
+                        subTitleName: "Donate ₹10,000 to unlock this reward",
+                        rewardIcon: Icon(
+                          Icons.volunteer_activism,
+                          size: 45,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Divider(),
+                      CustomListTile(
+                        iconBgColor: Colors.orange.shade200,
+                        titleName: "Generous Giver",
+                        subTitleName: "Donate ₹20,000 to unlock this reward",
+                        rewardIcon: Icon(
+                          Icons.star_rounded,
+                          size: 45,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Divider(),
+                      CustomListTile(
+                        iconBgColor: Colors.purple.shade100,
+                        titleName: "Hope Spreader",
+                        subTitleName: "Donate ₹30,000 to unlock this reward",
+                        rewardIcon: Icon(
+                          Icons.favorite,
+                          size: 45,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Divider(),
+                      CustomListTile(
+                        iconBgColor: Colors.blue.shade100,
+                        titleName: "Visionary Donor",
+                        subTitleName: "Donate ₹40,000 to unlock this reward",
+                        rewardIcon: Icon(
+                          Icons.diamond_outlined,
+                          size: 45,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Divider(),
+                      CustomListTile(
+                        iconBgColor: Colors.green.shade100,
+                        titleName: "Major Impact Maker",
+                        subTitleName: "Donate ₹80,000 to unlock this reward",
+                        rewardIcon: Icon(
+                          Icons.public,
+                          size: 45,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Divider(),
+                      CustomListTile(
+                        iconBgColor: Colors.cyan.shade100,
+                        titleName: "Major Supporter",
+                        subTitleName: "Donate ₹100,000 to unlock this reward",
+                        rewardIcon: Icon(
+                          Icons.military_tech,
+                          size: 45,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

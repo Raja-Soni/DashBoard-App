@@ -32,11 +32,11 @@ class LeaderboardPageState extends State<LeaderboardPage> {
               child: CustomContainer(
                 width: double.infinity,
                 borderRadius: 10,
-                backgroundColor: Colors.green.shade100,
+                backgroundColor: Colors.grey.shade500,
                 child: Center(
                   child: CustomText(
                     text: "Top Donators",
-                    textColor: Colors.black,
+                    textColor: Colors.white,
                     textSize: 30,
                     textBoldness: FontWeight.bold,
                   ),

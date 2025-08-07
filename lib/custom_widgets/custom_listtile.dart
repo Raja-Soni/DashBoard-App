@@ -9,7 +9,7 @@ class CustomListTile extends StatelessWidget {
   final Icon rewardIcon;
   final Color iconBgColor;
 
-  CustomListTile({
+  const CustomListTile({
     super.key,
     required this.titleName,
     required this.subTitleName,
@@ -32,7 +32,7 @@ class CustomListTile extends StatelessWidget {
       subtitle: CustomText(
         textSize: 15,
         text: subTitleName,
-        textColor: Colors.grey.shade700,
+        textColor: Colors.grey.shade800,
       ),
     );
   }
