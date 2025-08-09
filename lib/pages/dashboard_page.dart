@@ -36,71 +36,68 @@ class DashboardPageState extends State<DashboardPage> {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: Row(
-            children: [
-              Icon(Icons.dashboard, color: Colors.white, size: 30),
-              SizedBox(width: 10),
-              Expanded(child: CustomText(text: "DashBoard", textSize: 30)),
-              PopupMenuButton(
-                iconColor: Colors.white,
-                color: Colors.white,
-                onSelected: (value) async {
-                  if (value == "Announcements") {
-                    Navigator.push(
-                      context,
-                      PageTransition(
-                        type: PageTransitionType.rightToLeftWithFade,
-                        curve: Curves.fastOutSlowIn,
-                        duration: Duration(milliseconds: 400),
-                        child: AnnouncementPage(),
-                      ),
-                    );
-                  } else if (value == "Leader Board") {
-                    Navigator.push(
-                      context,
-                      PageTransition(
-                        type: PageTransitionType.rightToLeftWithFade,
-                        curve: Curves.fastOutSlowIn,
-                        duration: Duration(milliseconds: 400),
-                        child: LeaderboardPage(),
-                      ),
-                    );
-                  } else if (value == "Logout") {
-                    await FirebaseAuth.instance.signOut();
-                    Navigator.pushReplacement(
-                      context,
-                      PageTransition(
-                        type: PageTransitionType.leftToRight,
-                        curve: Curves.fastOutSlowIn,
-                        duration: Duration(milliseconds: 400),
-                        child: HomePage(),
-                      ),
-                    );
-                  }
-                },
-                itemBuilder: (BuildContext context) => [
-                  PopupMenuItem(
-                    value: "Leader Board",
-                    child: CustomText(
-                      text: "Leader Board",
-                      textColor: Colors.black,
+          leading: Icon(Icons.dashboard, color: Colors.white, size: 30),
+          title: Expanded(child: CustomText(text: "DashBoard", textSize: 30)),
+          actions: [
+            PopupMenuButton(
+              iconColor: Colors.white,
+              color: Colors.white,
+              onSelected: (value) async {
+                if (value == "Announcements") {
+                  Navigator.push(
+                    context,
+                    PageTransition(
+                      type: PageTransitionType.rightToLeftWithFade,
+                      curve: Curves.fastOutSlowIn,
+                      duration: Duration(milliseconds: 400),
+                      child: AnnouncementPage(),
                     ),
-                  ),
-                  PopupMenuItem(
-                    value: "Announcements",
-                    child: CustomText(
-                      text: "Announcements",
-                      textColor: Colors.black,
+                  );
+                } else if (value == "Leader Board") {
+                  Navigator.push(
+                    context,
+                    PageTransition(
+                      type: PageTransitionType.rightToLeftWithFade,
+                      curve: Curves.fastOutSlowIn,
+                      duration: Duration(milliseconds: 400),
+                      child: LeaderboardPage(),
                     ),
+                  );
+                } else if (value == "Logout") {
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.pushReplacement(
+                    context,
+                    PageTransition(
+                      type: PageTransitionType.leftToRight,
+                      curve: Curves.fastOutSlowIn,
+                      duration: Duration(milliseconds: 400),
+                      child: HomePage(),
+                    ),
+                  );
+                }
+              },
+              itemBuilder: (BuildContext context) => [
+                PopupMenuItem(
+                  value: "Leader Board",
+                  child: CustomText(
+                    text: "Leader Board",
+                    textColor: Colors.black,
                   ),
-                  PopupMenuItem(
-                    value: "Logout",
-                    child: CustomText(text: "Logout", textColor: Colors.black),
+                ),
+                PopupMenuItem(
+                  value: "Announcements",
+                  child: CustomText(
+                    text: "Announcements",
+                    textColor: Colors.black,
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+                PopupMenuItem(
+                  value: "Logout",
+                  child: CustomText(text: "Logout", textColor: Colors.black),
+                ),
+              ],
+            ),
+          ],
           backgroundColor: Colors.blue.shade800,
         ),
         body: Padding(
